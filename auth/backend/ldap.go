@@ -109,7 +109,7 @@ func (backend *ldapBackend) searchUserSSHPubkey(username string) (ret []string, 
 		backend.searchBase,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		"(&(objectClass=posixAccount)(uid="+username+"))",
-		[]string{"sshPublicKey", "memberUid"},
+		[]string{"ipaSshPubKey", "sshPublicKey", "memberUid"},
 		nil,
 	))
 
@@ -121,9 +121,10 @@ func (backend *ldapBackend) searchUserSSHPubkey(username string) (ret []string, 
 
 	for _, entry := range sr.Entries {
 		for _, attr := range entry.Attributes {
-			if attr.Name == "sshPublicKey" {
+			switch attr.Name {
+			case "sshPublicKey", "ipaSshPubKey":
 				ret = append(ret, attr.Values...)
-			} else if attr.Name == "memberUid" {
+			case "memberUid":
 				memberUidsOfUser = append(memberUidsOfUser, attr.Values...)
 			}
 		}
@@ -138,7 +139,7 @@ func (backend *ldapBackend) searchUserSSHPubkey(username string) (ret []string, 
 		backend.searchBase,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		"(|(&(objectClass=posixGroup)(|(memberUid="+username+")(memberUid=ALL)))(&(objectClass=posixAccount)(|"+to_join_users+")))",
-		[]string{"sshPublicKey"},
+		[]string{"sshPublicKey", "ipaSshPubKey"},
 		nil,
 	))
 
