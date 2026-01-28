@@ -130,26 +130,28 @@ func (backend *ldapBackend) searchUserSSHPubkey(username string) (ret []string, 
 		}
 	}
 
-	var to_join_users string
-	for _, uid := range memberUidsOfUser {
-		to_join_users += "(uid=" + uid + ")"
-	}
+	if len(memberUidsOfUser) > 0 {
+		var to_join_users string
+		for _, uid := range memberUidsOfUser {
+			to_join_users += "(uid=" + uid + ")"
+		}
 
-	sr, err = conn.Search(ldap.NewSearchRequest(
-		backend.searchBase,
-		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		"(|(&(objectClass=posixGroup)(|(memberUid="+username+")(memberUid=ALL)))(&(objectClass=posixAccount)(|"+to_join_users+")))",
-		[]string{"sshPublicKey", "ipaSshPubKey"},
-		nil,
-	))
+		sr, err = conn.Search(ldap.NewSearchRequest(
+			backend.searchBase,
+			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
+			"(|(&(objectClass=posixGroup)(|(memberUid="+username+")(memberUid=ALL)))(&(objectClass=posixAccount)(|"+to_join_users+")))",
+			[]string{"sshPublicKey", "ipaSshPubKey"},
+			nil,
+		))
 
-	if err != nil {
-		return
-	}
+		if err != nil {
+			return
+		}
 
-	for _, entry := range sr.Entries {
-		for _, attr := range entry.Attributes {
-			ret = append(ret, attr.Values...)
+		for _, entry := range sr.Entries {
+			for _, attr := range entry.Attributes {
+				ret = append(ret, attr.Values...)
+			}
 		}
 	}
 
