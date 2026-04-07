@@ -1,0 +1,16 @@
+[Unit]
+Description=Netgate - Inbound Network Gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/netgate -config /etc/netgate/config.yaml
+WorkingDirectory=/etc/netgate
+User=nobody
+Restart=always
+RestartSec=5
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
