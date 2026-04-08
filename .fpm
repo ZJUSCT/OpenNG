@@ -1,0 +1,11 @@
+-s dir
+--name netgate
+--category net
+--license MIT
+--description "An inbound network gateway with authentication, proxy, and management UI."
+--url "https://github.com/mrhaoxx/OpenNG"
+--maintainer "mrhaoxx <mr.haoxx@gmail.com>"
+--config-files /etc/netgate/config.yaml
+doc/config-sample.yaml=/etc/netgate/config.yaml
+netgate.service=/usr/lib/systemd/system/netgate.service
+netgate=/usr/bin/netgate
